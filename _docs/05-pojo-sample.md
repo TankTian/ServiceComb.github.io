@@ -37,7 +37,7 @@ swagger: '2.0'
 info:
   title: hello
   version: 1.0.0
-  x-java-interface: io.servicecomb.demo.Hello
+  x-java-interface: io.servicecomb.samples.pojo.Hello
 basePath: /pojo/rest/hello
 produces:
   - application/json
@@ -54,13 +54,40 @@ paths:
             type: string
       responses:
         200:
-          description: 成功返回值
+          description: 正确返回
           schema:
             type: string
         default:
-          description: 默认返回值
+          description: 默认返回
           schema:
             type: string
+  /sayhello:
+     post:
+          operationId: sayHello
+          parameters:
+            - name: person
+              in: body
+              required: true
+              schema:
+                $ref: "#/definitions/Person"
+          responses:
+            200:
+              description: 正确返回
+              schema:
+                type: string
+            default:
+              description: 默认返回
+              schema:
+                type: string
+definitions:
+  Person:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "person name"
+    xml:
+      name: "Person"
 ```
 **Note:** 推荐使用Swagger Editor工具来编写契约，工具链接：[swagger-editor](http://swagger.io/swagger-editor/)
 {: .notice--warning}
@@ -145,6 +172,7 @@ cse:
 ```java
 public interface Hello {
     String sayHi(String name);
+    String sayHello(Person person);
 }
 ```
 
@@ -153,25 +181,24 @@ public interface Hello {
 实现服务契约接口HelloImpl.java
 
 ```java
+@RpcSchema(schemaId = "hello")
 public class HelloImpl implements Hello {
+    @Override
     public String sayHi(String name) {
         return "Hello " + name;
+    }
+
+    @Override
+    public String sayHello(Person person) {
+        return "Hello person " + person.getName();
     }
 }
 ```
 
-**服务启动代码**
+**服务启动**
 
-
-```java
-public class SimpleServer {
-
-        public static void main(String[] args) throws Exception {
-            Log4jUtils.init();
-            BeanUtils.init();
-        }
-
-}
+```
+mvn test -Pserver
 ```
 
 
@@ -180,16 +207,15 @@ public class SimpleServer {
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
 		http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc-1.0.xsd">
-	<cse:rpc-schema schema-id="hello"
-		implementation="io.servicecomb.demo.server.HelloImpl"></cse:rpc-schema>
-        <context:component-scan base-package="io.servicecomb.demo" />
+		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
+
+    <context:component-scan base-package="io.servicecomb.samples.pojo.server" />
 </beans>
 ```
 
@@ -207,7 +233,10 @@ cse:
   handler:
     chain:
       Consumer:
-        default: loadbalance
+        default: bizkeeper-consumer,loadbalance
+  isolation:
+    Consumer:
+      enabled: false
   references:
     hello:       # 微服务名称要与服务端一致
       version-rule: 0.0.1  # 微服务版本要与服务端一致
@@ -222,16 +251,16 @@ cse:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-    xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-        http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc-1.0.xsd">
-    <cse:rpc-reference id="hello" schema-id="hello"
-        microservice-name="helloserver"></cse:rpc-reference>    
-    <context:component-scan base-package="io.servicecomb.demo" />
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
+
+	<cse:rpc-reference id="hello" microservice-name="hello"
+		schema-id="hello" ></cse:rpc-reference>
 </beans>
 
 ```
@@ -241,21 +270,5 @@ cse:
 调用端在加载完日志配置、sdk配置后，就可以对服务进行远程调用了。
 
 ```
-@Component
-public class SimpleClient {
-
-    @RpcReference(microserviceName = "hello", schemaId = "hello")
-    private static Hello hello;
-
-    public static void main(String[] args) throws Exception {
-        init();
-        System.out.println(hello.sayHi("Java Chassis"));
-    }
-
-    public static void init() throws Exception {
-        Log4jUtils.init();
-        BeanUtils.init();
-    }
-
-}
+mvn test -Pclient
 ```
