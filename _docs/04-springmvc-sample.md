@@ -35,7 +35,7 @@ swagger: '2.0'
 info:
   title: hello
   version: 1.0.0
-  x-java-interface: io.servicecomb.demo.Hello
+  x-java-interface: io.servicecomb.samples.springmvc.Hello
 basePath: /pojo/rest/hello
 produces:
   - application/json
@@ -52,13 +52,40 @@ paths:
             type: string
       responses:
         200:
-          description: 成功返回值
+          description: 正确返回
           schema:
             type: string
         default:
-          description: 默认返回值
+          description: 默认返回
           schema:
             type: string
+  /sayhello:
+     post:
+          operationId: sayHello
+          parameters:
+            - name: person
+              in: body
+              required: true
+              schema:
+                $ref: "#/definitions/Person"
+          responses:
+            200:
+              description: 正确返回
+              schema:
+                type: string
+            default:
+              description: 默认返回
+              schema:
+                type: string
+definitions:
+  Person:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "person name"
+    xml:
+      name: "Person"
 ```
 **Note:** 推荐使用Swagger Editor工具来编写契约，工具链接：[http://swagger.io/swagger-editor/](swagger-editor)
 {: .notice--warning}
@@ -71,7 +98,7 @@ paths:
     <dependency>
       <groupId>io.servicecomb</groupId>
       <artifactId>java-chassis-dependencies</artifactId>
-      <version>0.1.0-m1</version>
+      <version>0.1.0-m3-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -86,7 +113,6 @@ paths:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
-        <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>

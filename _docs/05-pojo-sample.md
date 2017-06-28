@@ -100,7 +100,7 @@ definitions:
     <dependency>
       <groupId>io.servicecomb</groupId>
       <artifactId>java-chassis-dependencies</artifactId>
-      <version>0.1.0-m2</version>
+      <version>0.1.0-m3-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -115,7 +115,6 @@ definitions:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
-        <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -163,7 +162,7 @@ cse:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -242,7 +241,7 @@ cse:
       version-rule: 0.0.1  # 微服务版本要与服务端一致
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml（上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\client.microservice.yaml（上面注释需要去掉）
 {: .notice--warning}
 
 
