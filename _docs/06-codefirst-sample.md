@@ -34,7 +34,7 @@ redirect_from:
     <dependency>
       <groupId>io.servicecomb</groupId>
       <artifactId>java-chassis-dependencies</artifactId>
-      <version>0.1.0-m1</version>
+      <version>0.1.0-m3-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -49,7 +49,6 @@ redirect_from:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
-        <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -62,36 +61,30 @@ redirect_from:
 **服务端SDK配置**
 
 ```yaml
-APPLICATION_ID: hellotest   # app应用ID
+APPLICATION_ID: codefirsttest   # app应用ID
 service_description:
-  name: hello   # 为服务名，确保app内部唯一
+  name: codefirst   # 为服务名，确保app内部唯一
   version: 0.0.1 # 微服务版本号
 cse:
   service:
     registry:
-      address: http://127.0.0.1:9980 # 服务中心地址
+      address: http://127.0.0.1:30100 # 服务中心地址
   rest:
     address: 0.0.0.0:8080   # rest通道端口信息，确保该端口可监听
   highway:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml
+**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
 **服务接口**
 
 ```java
-public interface Compute {
-
-    int add(int a, int b);
-
-    int multi(int a, int b);
-
-    int sub(int a, int b);
-
-    int divide(int a, int b);
+public interface Hello {
+    String sayHi(String name);
+    String sayHello(Person person);
 }
 ```
 
