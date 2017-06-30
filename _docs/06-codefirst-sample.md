@@ -49,6 +49,7 @@ redirect_from:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
+	    <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -75,7 +76,7 @@ cse:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -90,32 +91,19 @@ public interface Hello {
 
 **服务实现**
 
-实现服务契约接口HelloImpl.java
+实现服务契约接口CodeFirstPojoHelloImpl.java
 
 ```java
-@RpcSchema(schemaId = "codefirstcompute")
-public class CodeFirstComputeImpl implements Compute{
+@RpcSchema(schemaId = "codeFirstHello")
+public class CodeFirstPojoHelloImpl implements Hello{
     @Override
-    public int add(int a, int b) {
-        return a + b;
+    public String sayHi(String name) {
+        return "Pojo Hello " + name;
     }
 
     @Override
-    public int multi(int a, int b) {
-        return a * b;
-    }
-
-    @Override
-    public int sub(int a, int b) {
-        return a - b;
-    }
-
-    @Override
-    public int divide(int a, int b) {
-        if (b != 0){
-            return a / b;
-        }
-        return 0;
+    public String sayHello(Person person) {
+        return "Pojo Hello person " + person.getName();
     }
 }
 ```
@@ -124,13 +112,18 @@ public class CodeFirstComputeImpl implements Compute{
 
 
 ```java
-public class SimpleServer {
-
-        public static void main(String[] args) throws Exception {
-            Log4jUtils.init();
-            BeanUtils.init();
+public class CodeFirstProviderMain {
+    public static void main(String[] args) throws Exception{
+        if (args.length != 0){
+            String fileName = args[0];
+            if (!fileName.isEmpty()) {
+                System.setProperty("cse.configurationSource.defaultFileName", fileName);
+            }
         }
-
+        Log4jUtils.init();
+        BeanUtils.init();
+        System.clearProperty("cse.configurationSource.defaultFileName");
+    }
 }
 ```
 
@@ -138,41 +131,38 @@ public class SimpleServer {
 **服务发布**
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
-    http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-    http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
+		http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		">
 
-    <context:component-scan base-package="io.servicecomb.demo.server" />
+    <context:component-scan base-package="io.servicecomb.samples.pojo.provider" />
 </beans>
 ```
 
 **调用端SDK配置**
 
 ```yaml
-APPLICATION_ID: hellotest  # app应用ID与服务端一致
+APPLICATION_ID: codefirsttest  # app应用ID与服务端一致
 service_description:
-  name: helloClient
+  name: codefirstClient
   version: 0.0.1
 cse:
   service:
     registry:
-      address: http://127.0.0.1:9980   # 服务中心IP
-  handler:
-    chain:
-      Consumer:
-        default: loadbalance
+      address: http://127.0.0.1:30100   # 服务中心IP
+  isolation:
+    Consumer:
+      enabled: false
   references:
-    hello:       # 微服务名称要与服务端一致
+    codefirst:       # 微服务名称要与服务端一致
       version-rule: 0.0.1  # 微服务版本要与服务端一致
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -183,20 +173,39 @@ cse:
 
 ```
 @Component
-public class SimpleClient {
+public class CodeFirstConsumerMain {
 
-    @RpcReference(microserviceName = "hello", schemaId = "codefirstcompute")
-    public static Compute compute;
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstJaxrsHello")
+    private static Hello jaxrsHello;
+
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstSpringmvcHello")
+    private static Hello springmvcHello;
+
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstHello")
+    private static Hello hello;
 
     public static void main(String[] args) throws Exception {
-        init();
-        System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
+        init(args);
+        System.out.println(hello.sayHi("Java Chassis"));
+        System.out.println(jaxrsHello.sayHi("Java Chassis"));
+        System.out.println(springmvcHello.sayHi("Java Chassis"));
+        Person person = new Person();
+        person.setName("ServiceComb/Java Chassis");
+        System.out.println(hello.sayHello(person));
+        System.out.println(jaxrsHello.sayHello(person));
+        System.out.println(springmvcHello.sayHello(person));
     }
 
-    public static void init() throws Exception {
+    public static void init(String[] args) throws Exception {
+        if (args.length != 0){
+            String fileName = args[0];
+            if (!fileName.isEmpty()) {
+                System.setProperty("cse.configurationSource.defaultFileName", fileName);
+            }
+        }
         Log4jUtils.init();
         BeanUtils.init();
+        System.clearProperty("cse.configurationSource.defaultFileName");
     }
-
 }
 ```
