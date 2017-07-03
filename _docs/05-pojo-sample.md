@@ -104,6 +104,11 @@ definitions:
       <type>pom</type>
       <scope>import</scope>
     </dependency>
+	<dependency>
+      <groupId>io.servicecomb.samples</groupId>
+      <artifactId>commmon-schema</artifactId>
+      <version>0.1.0-m3-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </dependencyManagement>
 
@@ -115,6 +120,7 @@ definitions:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
+	    <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -162,49 +168,68 @@ cse:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
 **服务接口**
 
 ```java
-public interface Hello {
-    String sayHi(String name);
-    String sayHello(Person person);
+public interface Compute {
+  int add(int a, int b);
+  int multi(int a, int b);
+  int sub(int a, int b);
+  int divide(int a, int b);
 }
 ```
 
 **服务实现**
 
-实现服务契约接口HelloImpl.java
+实现服务契约接口CodeFirstComputeImpl.java
 
 ```java
-@RpcSchema(schemaId = "hello")
-public class HelloImpl implements Hello {
-    @Override
-    public String sayHi(String name) {
-        return "Hello " + name;
-    }
+@RpcSchema(schemaId = "codeFirstCompute")
+public class CodeFirstComputeImpl implements Compute {
+  @Override
+  public int add(int a, int b) {
+    return a + b;
+  }
 
-    @Override
-    public String sayHello(Person person) {
-        return "Hello person " + person.getName();
+  @Override
+  public int multi(int a, int b) {
+    return a * b;
+  }
+
+  @Override
+  public int sub(int a, int b) {
+    return a - b;
+  }
+
+  @Override
+  public int divide(int a, int b) {
+    if (b != 0) {
+      return a / b;
     }
+    return 0;
+  }
 }
 ```
 
-**服务启动**
+**服务启动代码**
 
-```
-mvn test -Pserver
+```java
+public class PojoProviderMain {
+  public static void main(String[] args) throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
+}
 ```
 
 
 **服务发布**
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
        xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
@@ -214,7 +239,8 @@ mvn test -Pserver
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
 
-    <context:component-scan base-package="io.servicecomb.samples.pojo.server" />
+    <context:component-scan base-package="io.servicecomb.samples.pojo.provider" />
+</beans>
 </beans>
 ```
 
@@ -228,7 +254,7 @@ service_description:
 cse:
   service:
     registry:
-      address: http://127.0.0.1:9980   # 服务中心IP
+      address: http://127.0.0.1:30100   # 服务中心IP
   handler:
     chain:
       Consumer:
@@ -241,7 +267,7 @@ cse:
       version-rule: 0.0.1  # 微服务版本要与服务端一致
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\client.microservice.yaml（上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml（上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -268,6 +294,28 @@ cse:
 
 调用端在加载完日志配置、sdk配置后，就可以对服务进行远程调用了。
 
-```
-mvn test -Pclient
+```java
+@Component
+public class PojoConsumerMain {
+
+	@RpcReference(microserviceName = "hello", schemaId = "hello")
+	private static Hello hello;
+
+	@RpcReference(microserviceName = "hello", schemaId = "codeFirstCompute")
+	public static Compute compute;
+
+	public static void main(String[] args) throws Exception {
+		init();
+		System.out.println(hello.sayHi("Java Chassis"));
+		Person person = new Person();
+		person.setName("ServiceComb/Java Chassis");
+		System.out.println(hello.sayHello(person));
+		System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
+	}
+
+	public static void init() throws Exception {
+		Log4jUtils.init();
+		BeanUtils.init();
+	}
+}
 ```

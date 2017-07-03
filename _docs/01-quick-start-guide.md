@@ -62,19 +62,15 @@ Linux
 
 ### 运行Provider工程发布服务
 
-导入示例工程，在根目录直接运行maven命令，启动成功完成服务发布。  
+导入示例工程，通过IDE直接运行Provider工程Main函数，启动成功完成服务发布。  
 
-```
-mvn test -Pserver
-```
+Main函数所在的类：pojo-provider:PojoProviderMain
 
 ### 运行Consumer端服务消费
 
-导入示例工程，在根目录直接运行maven命令， 
+导入示例工程，通过IDE直接运行Consumer工程Main函数   
 
-```
-mvn test -Pclient
-```
+Main函数所在的类：pojo-consumer:PojoConsumerMain    
 
 启动成功，打印输出信息完成服务消费。
 
