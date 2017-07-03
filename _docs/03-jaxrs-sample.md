@@ -168,8 +168,8 @@ public class JaxrsHelloImpl implements Hello {
 public class JaxrsProviderMain {
 
     public static void main(String[] args) throws Exception {
-      Log4jUtils.init();
-      BeanUtils.init();
+        Log4jUtils.init();
+        BeanUtils.init();
     }
 	
 }
