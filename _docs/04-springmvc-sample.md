@@ -102,7 +102,7 @@ definitions:
       <type>pom</type>
       <scope>import</scope>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>io.servicecomb.samples</groupId>
       <artifactId>commmon-schema</artifactId>
       <version>0.1.0-m3-SNAPSHOT</version>
@@ -118,7 +118,7 @@ definitions:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
-	    <compilerArgument>-parameters</compilerArgument>
+        <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
