@@ -212,10 +212,10 @@ public class HelloImpl implements Hello {
 ```java
 public class PojoProviderMain {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         Log4jUtils.init();
         BeanUtils.init();
-	}
+    }
 	
 }
 ```
