@@ -38,6 +38,11 @@ redirect_from:
       <type>pom</type>
       <scope>import</scope>
     </dependency>
+	<dependency>
+      <groupId>io.servicecomb.samples</groupId>
+      <artifactId>commmon-schema</artifactId>
+      <version>0.1.0-m3-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </dependencyManagement>
 
@@ -113,17 +118,11 @@ public class CodeFirstPojoHelloImpl implements Hello{
 
 ```java
 public class CodeFirstProviderMain {
-    public static void main(String[] args) throws Exception{
-        if (args.length != 0){
-            String fileName = args[0];
-            if (!fileName.isEmpty()) {
-                System.setProperty("cse.configurationSource.defaultFileName", fileName);
-            }
-        }
-        Log4jUtils.init();
-        BeanUtils.init();
-        System.clearProperty("cse.configurationSource.defaultFileName");
-    }
+
+  public static void main(String[] args) throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
 }
 ```
 
@@ -175,37 +174,30 @@ cse:
 @Component
 public class CodeFirstConsumerMain {
 
-    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstJaxrsHello")
-    private static Hello jaxrsHello;
+  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstJaxrsHello")
+  private static Hello jaxrsHello;
 
-    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstSpringmvcHello")
-    private static Hello springmvcHello;
+  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstSpringmvcHello")
+  private static Hello springmvcHello;
 
-    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstHello")
-    private static Hello hello;
+  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstHello")
+  private static Hello hello;
 
-    public static void main(String[] args) throws Exception {
-        init(args);
-        System.out.println(hello.sayHi("Java Chassis"));
-        System.out.println(jaxrsHello.sayHi("Java Chassis"));
-        System.out.println(springmvcHello.sayHi("Java Chassis"));
-        Person person = new Person();
-        person.setName("ServiceComb/Java Chassis");
-        System.out.println(hello.sayHello(person));
-        System.out.println(jaxrsHello.sayHello(person));
-        System.out.println(springmvcHello.sayHello(person));
-    }
+  public static void main(String[] args) throws Exception {
+    init();
+    System.out.println(hello.sayHi("Java Chassis"));
+    System.out.println(jaxrsHello.sayHi("Java Chassis"));
+    System.out.println(springmvcHello.sayHi("Java Chassis"));
+    Person person = new Person();
+    person.setName("ServiceComb/Java Chassis");
+    System.out.println(hello.sayHello(person));
+    System.out.println(jaxrsHello.sayHello(person));
+    System.out.println(springmvcHello.sayHello(person));
+  }
 
-    public static void init(String[] args) throws Exception {
-        if (args.length != 0){
-            String fileName = args[0];
-            if (!fileName.isEmpty()) {
-                System.setProperty("cse.configurationSource.defaultFileName", fileName);
-            }
-        }
-        Log4jUtils.init();
-        BeanUtils.init();
-        System.clearProperty("cse.configurationSource.defaultFileName");
-    }
+  public static void init() throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
 }
 ```

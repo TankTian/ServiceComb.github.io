@@ -75,6 +75,11 @@ paths:
       <type>pom</type>
       <scope>import</scope>
     </dependency>
+	<dependency>
+      <groupId>io.servicecomb.samples</groupId>
+      <artifactId>commmon-schema</artifactId>
+      <version>0.1.0-m3-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </dependencyManagement>
 
@@ -86,6 +91,7 @@ paths:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
+	    <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -112,7 +118,7 @@ cse:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -130,31 +136,39 @@ public interface Hello {
 使用JAX-RS标注进行业务代码的开发，实现服务契约接口JaxrsHelloImpl.java
 
 ```java
-@RpcSchema(schemaId = "jaxrsHello")
+@RestSchema(schemaId = "jaxrsHello")
 @Path("/jaxrshello")
 @Produces(MediaType.APPLICATION_JSON)
 public class JaxrsHelloImpl implements Hello {
-    @Path("/sayhi")
-    @POST
-    @Override
-    public String sayHi(String name) {
-        return "Hello " + name;
-    }
 
-    @Path("/sayhello")
-    @POST
-    @Override
-    public String sayHello(Person person) {
-        return "Hello person " + person.getName();
-    }
+  @Path("/sayhi")
+  @POST
+  @Override
+  public String sayHi(String name) {
+    return "Hello " + name;
+  }
+  
+  @Path("/sayhello")
+  @POST
+  @Override
+  public String sayHello(Person person) {
+    return "Hello person " + person.getName();
+  }
+
 }
 ```
 
-**服务启动**
+**服务启动代码**
 
 
-```
-mvn test -Pserver
+```java
+public class JaxrsProviderMain {
+
+  public static void main(String[] args) throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
+}
 ```
 
 
@@ -163,7 +177,7 @@ mvn test -Pserver
 ```yaml
 APPLICATION_ID: jaxrstest  # app应用ID与服务端一致
 service_description:
-  name: jaxrsClient
+  name: helloClient
   version: 0.0.1
 cse:
   service:
@@ -181,7 +195,7 @@ cse:
       version-rule: 0.0.1  # 微服务版本要与服务端一致
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\client.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -189,6 +203,24 @@ cse:
 
 调用端在加载完日志配置、sdk配置后，就可以对服务进行远程调用了。
 
-```
-mvn test -Pclient
+```java
+@Component
+public class JaxrsConsumerMain {
+
+  @RpcReference(microserviceName = "jaxrs", schemaId = "jaxrsHello")
+  private static Hello hello;
+
+  public static void main(String[] args) throws Exception {
+    init();
+    System.out.println(hello.sayHi("Java Chassis"));
+    Person person = new Person();
+    person.setName("ServiceComb/Java Chassis");
+    System.out.println(hello.sayHello(person));
+  }
+
+  public static void init() throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
+}
 ```

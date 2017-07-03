@@ -102,6 +102,11 @@ definitions:
       <type>pom</type>
       <scope>import</scope>
     </dependency>
+	<dependency>
+      <groupId>io.servicecomb.samples</groupId>
+      <artifactId>commmon-schema</artifactId>
+      <version>0.1.0-m3-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </dependencyManagement>
 
@@ -113,6 +118,7 @@ definitions:
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
       <configuration>
+	    <compilerArgument>-parameters</compilerArgument>
         <encoding>UTF-8</encoding>
         <source>1.8</source>
         <target>1.8</target>
@@ -139,7 +145,7 @@ cse:
     address: 0.0.0.0:7070   # highway通道端口信息，确保该端口可监听
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\server.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -157,28 +163,36 @@ public interface Hello {
 实现服务契约接口SpringmvcHelloImpl.java
 
 ```java
-@RpcSchema(schemaId = "springmvcHello")
+@RestSchema(schemaId = "springmvcHello")
 @RequestMapping(path = "/springmvchello", produces = MediaType.APPLICATION_JSON)
 public class SpringmvcHelloImpl implements Hello {
-    @Override
-    @RequestMapping(path = "/sayhi", method = RequestMethod.POST)
-    public String sayHi(@RequestParam(name = "name") String name) {
-        return "Hello " + name;
-    }
 
-    @Override
-    @RequestMapping(path = "/sayhello", method = RequestMethod.POST)
-    public String sayHello(@RequestBody Person person) {
-        return "Hello person " + person.getName();
-    }
+  @Override
+  @RequestMapping(path = "/sayhi", method = RequestMethod.POST)
+  public String sayHi(@RequestParam(name = "name") String name) {
+    return "Hello " + name;
+  }
+
+  @Override
+  @RequestMapping(path = "/sayhello", method = RequestMethod.POST)
+  public String sayHello(@RequestBody Person person) {
+    return "Hello person " + person.getName();
+  }
+
 }
 ```
 
-**服务启动**
+**服务启动代码**
 
 
-```
-mvn test -Pserver
+```java
+public class SpringmvcProviderMain {
+
+  public static void main(String[] args) throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
+}
 ```
 
 
@@ -187,7 +201,7 @@ mvn test -Pserver
 ```yaml
 APPLICATION_ID: springmvctest  # app应用ID与服务端一致
 service_description:
-  name: springmvcClient
+  name: springmvcConsumer
   version: 0.0.1
 cse:
   service:
@@ -205,7 +219,7 @@ cse:
       version-rule: 0.0.1  # 微服务版本要与服务端一致
 ```
 
-**Note:** SDK配置文件路径为： \src\main\resources\client.microservice.yaml （上面注释需要去掉）
+**Note:** SDK配置文件路径为： \src\main\resources\microservice.yaml （上面注释需要去掉）
 {: .notice--warning}
 
 
@@ -231,6 +245,38 @@ cse:
 
 调用端在加载完日志配置、sdk配置后，就可以对服务进行远程调用了。
 
-```
-mvn test -Pclient
+```java
+@Component
+public class SpringmvcConsumerMain {
+
+  private static RestTemplate restTemplate = RestTemplateBuilder.create();
+
+  @RpcReference(microserviceName = "springmvc", schemaId = "springmvcHello")
+  private static Hello hello;
+
+  public static void main(String[] args) throws Exception {
+    init();
+    Person person = new Person();
+    person.setName("ServiceComb/Java Chassis");
+
+
+    // RestTemplate Consumer or POJO Consumer. You can choose whatever you like
+    // RestTemplate Consumer
+    String sayHiResult =
+        restTemplate.postForObject("cse://springmvc/springmvchello/sayhi?name=Java Chassis", null, String.class);
+    String sayHelloResult = restTemplate.postForObject("cse://springmvc/springmvchello/sayhello", person, String.class);
+    System.out.println("RestTemplate Consumer or POJO Consumer.  You can choose whatever you like.");
+    System.out.println("RestTemplate consumer sayhi services: " + sayHiResult);
+    System.out.println("RestTemplate consumer sayhello services: " + sayHelloResult);
+
+    // POJO Consumer
+    System.out.println("POJO consumer sayhi services: " + hello.sayHi("Java Chassis"));
+    System.out.println("POJO consumer sayhi services: " + hello.sayHello(person));
+  }
+
+  public static void init() throws Exception {
+    Log4jUtils.init();
+    BeanUtils.init();
+  }
+}
 ```

@@ -231,16 +231,16 @@ public class PojoProviderMain {
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-		http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+   xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xsi:schemaLocation="
+	http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
 
-    <context:component-scan base-package="io.servicecomb.samples.pojo.provider" />
-</beans>
+  <context:component-scan base-package="io.servicecomb.samples.pojo.provider" />
+  
 </beans>
 ```
 
@@ -276,16 +276,17 @@ cse:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-		http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
-
-	<cse:rpc-reference id="hello" microservice-name="hello"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:util="http://www.springframework.org/schema/util" xmlns:cse="http://www.huawei.com/schema/paas/cse/rpc"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="
+  	http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-3.0.xsd
+  	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  	http://www.huawei.com/schema/paas/cse/rpc classpath:META-INF/spring/spring-paas-cse-rpc.xsd">
+  
+  <cse:rpc-reference id="hello" microservice-name="hello"
 		schema-id="hello" ></cse:rpc-reference>
+		
 </beans>
 
 ```
@@ -297,25 +298,24 @@ cse:
 ```java
 @Component
 public class PojoConsumerMain {
-
-	@RpcReference(microserviceName = "hello", schemaId = "hello")
-	private static Hello hello;
-
-	@RpcReference(microserviceName = "hello", schemaId = "codeFirstCompute")
-	public static Compute compute;
-
-	public static void main(String[] args) throws Exception {
-		init();
-		System.out.println(hello.sayHi("Java Chassis"));
-		Person person = new Person();
-		person.setName("ServiceComb/Java Chassis");
-		System.out.println(hello.sayHello(person));
-		System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
-	}
-
-	public static void init() throws Exception {
-		Log4jUtils.init();
-		BeanUtils.init();
-	}
+  @RpcReference(microserviceName = "hello", schemaId = "hello")
+  private static Hello hello;
+  
+  @RpcReference(microserviceName = "hello", schemaId = "codeFirstCompute")
+  public static Compute compute;
+  
+  public static void main(String[] args) throws Exception {
+  	init();
+  	System.out.println(hello.sayHi("Java Chassis"));
+  	Person person = new Person();
+  	person.setName("ServiceComb/Java Chassis");
+  	System.out.println(hello.sayHello(person));
+  	System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
+  }
+  
+  public static void init() throws Exception {
+  	Log4jUtils.init();
+  	BeanUtils.init();
+  }
 }
 ```
