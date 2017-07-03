@@ -126,8 +126,11 @@ cse:
 
 ```java
 public interface Hello {
+
     String sayHi(String name);
+	
     String sayHello(Person person);
+	
 }
 ```
 
@@ -141,19 +144,19 @@ public interface Hello {
 @Produces(MediaType.APPLICATION_JSON)
 public class JaxrsHelloImpl implements Hello {
 
-  @Path("/sayhi")
-  @POST
-  @Override
-  public String sayHi(String name) {
-    return "Hello " + name;
-  }
-  
-  @Path("/sayhello")
-  @POST
-  @Override
-  public String sayHello(Person person) {
-    return "Hello person " + person.getName();
-  }
+    @Path("/sayhi")
+    @POST
+    @Override
+    public String sayHi(String name) {
+        return "Hello " + name;
+    }
+    
+    @Path("/sayhello")
+    @POST
+    @Override
+    public String sayHello(Person person) {
+        return "Hello person " + person.getName();
+    }
 
 }
 ```
@@ -164,10 +167,11 @@ public class JaxrsHelloImpl implements Hello {
 ```java
 public class JaxrsProviderMain {
 
-  public static void main(String[] args) throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    public static void main(String[] args) throws Exception {
+      Log4jUtils.init();
+      BeanUtils.init();
+    }
+	
 }
 ```
 
@@ -207,20 +211,21 @@ cse:
 @Component
 public class JaxrsConsumerMain {
 
-  @RpcReference(microserviceName = "jaxrs", schemaId = "jaxrsHello")
-  private static Hello hello;
-
-  public static void main(String[] args) throws Exception {
-    init();
-    System.out.println(hello.sayHi("Java Chassis"));
-    Person person = new Person();
-    person.setName("ServiceComb/Java Chassis");
-    System.out.println(hello.sayHello(person));
-  }
-
-  public static void init() throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    @RpcReference(microserviceName = "jaxrs", schemaId = "jaxrsHello")
+    private static Hello hello;
+    
+    public static void main(String[] args) throws Exception {
+        init();
+        System.out.println(hello.sayHi("Java Chassis"));
+        Person person = new Person();
+        person.setName("ServiceComb/Java Chassis");
+        System.out.println(hello.sayHello(person));
+    }
+    
+    public static void init() throws Exception {
+        Log4jUtils.init();
+        BeanUtils.init();
+    }
+	
 }
 ```

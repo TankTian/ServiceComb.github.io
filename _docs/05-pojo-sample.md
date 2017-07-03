@@ -174,44 +174,36 @@ cse:
 
 **服务接口**
 
+示例中定义了两个服务接口：Compute与Hello，此处以Hello为例
+
 ```java
-public interface Compute {
-  int add(int a, int b);
-  int multi(int a, int b);
-  int sub(int a, int b);
-  int divide(int a, int b);
+public interface Hello {
+
+    String sayHi(String name);
+	
+    String sayHello(Person person);
+	
 }
 ```
 
 **服务实现**
 
-实现服务契约接口CodeFirstComputeImpl.java
+实现服务契约接口HelloImpl.java
 
 ```java
-@RpcSchema(schemaId = "codeFirstCompute")
-public class CodeFirstComputeImpl implements Compute {
-  @Override
-  public int add(int a, int b) {
-    return a + b;
-  }
+@RpcSchema(schemaId = "hello")
+public class HelloImpl implements Hello {
 
-  @Override
-  public int multi(int a, int b) {
-    return a * b;
-  }
-
-  @Override
-  public int sub(int a, int b) {
-    return a - b;
-  }
-
-  @Override
-  public int divide(int a, int b) {
-    if (b != 0) {
-      return a / b;
+    @Override
+    public String sayHi(String name) {
+        return "Hello " + name;
     }
-    return 0;
-  }
+
+    @Override
+    public String sayHello(Person person) {
+        return "Hello person " + person.getName();
+    }
+
 }
 ```
 
@@ -219,10 +211,12 @@ public class CodeFirstComputeImpl implements Compute {
 
 ```java
 public class PojoProviderMain {
-  public static void main(String[] args) throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+
+	public static void main(String[] args) throws Exception {
+		Log4jUtils.init();
+		BeanUtils.init();
+	}
+	
 }
 ```
 
@@ -298,24 +292,26 @@ cse:
 ```java
 @Component
 public class PojoConsumerMain {
-  @RpcReference(microserviceName = "hello", schemaId = "hello")
-  private static Hello hello;
-  
-  @RpcReference(microserviceName = "hello", schemaId = "codeFirstCompute")
-  public static Compute compute;
-  
-  public static void main(String[] args) throws Exception {
-  	init();
-  	System.out.println(hello.sayHi("Java Chassis"));
-  	Person person = new Person();
-  	person.setName("ServiceComb/Java Chassis");
-  	System.out.println(hello.sayHello(person));
-  	System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
-  }
-  
-  public static void init() throws Exception {
-  	Log4jUtils.init();
-  	BeanUtils.init();
-  }
+
+	@RpcReference(microserviceName = "hello", schemaId = "hello")
+	private static Hello hello;
+
+	@RpcReference(microserviceName = "hello", schemaId = "codeFirstCompute")
+	public static Compute compute;
+
+	public static void main(String[] args) throws Exception {
+		init();
+		System.out.println(hello.sayHi("Java Chassis"));
+		Person person = new Person();
+		person.setName("ServiceComb/Java Chassis");
+		System.out.println(hello.sayHello(person));
+		System.out.println("a: 1, b=2, result=" + compute.add(1, 2));
+	}
+
+	public static void init() throws Exception {
+		Log4jUtils.init();
+		BeanUtils.init();
+	}
+	
 }
 ```

@@ -153,8 +153,11 @@ cse:
 
 ```java
 public interface Hello {
+
     String sayHi(String name);
+	
     String sayHello(Person person);
+
 }
 ```
 
@@ -167,17 +170,17 @@ public interface Hello {
 @RequestMapping(path = "/springmvchello", produces = MediaType.APPLICATION_JSON)
 public class SpringmvcHelloImpl implements Hello {
 
-  @Override
-  @RequestMapping(path = "/sayhi", method = RequestMethod.POST)
-  public String sayHi(@RequestParam(name = "name") String name) {
-    return "Hello " + name;
-  }
-
-  @Override
-  @RequestMapping(path = "/sayhello", method = RequestMethod.POST)
-  public String sayHello(@RequestBody Person person) {
-    return "Hello person " + person.getName();
-  }
+    @Override
+    @RequestMapping(path = "/sayhi", method = RequestMethod.POST)
+    public String sayHi(@RequestParam(name = "name") String name) {
+        return "Hello " + name;
+    }
+    
+    @Override
+    @RequestMapping(path = "/sayhello", method = RequestMethod.POST)
+    public String sayHello(@RequestBody Person person) {
+        return "Hello person " + person.getName();
+    }
 
 }
 ```
@@ -188,10 +191,11 @@ public class SpringmvcHelloImpl implements Hello {
 ```java
 public class SpringmvcProviderMain {
 
-  public static void main(String[] args) throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    public static void main(String[] args) throws Exception {
+        Log4jUtils.init();
+        BeanUtils.init();
+    }
+	
 }
 ```
 
@@ -249,34 +253,34 @@ cse:
 @Component
 public class SpringmvcConsumerMain {
 
-  private static RestTemplate restTemplate = RestTemplateBuilder.create();
-
-  @RpcReference(microserviceName = "springmvc", schemaId = "springmvcHello")
-  private static Hello hello;
-
-  public static void main(String[] args) throws Exception {
-    init();
-    Person person = new Person();
-    person.setName("ServiceComb/Java Chassis");
-
-
-    // RestTemplate Consumer or POJO Consumer. You can choose whatever you like
-    // RestTemplate Consumer
-    String sayHiResult =
-        restTemplate.postForObject("cse://springmvc/springmvchello/sayhi?name=Java Chassis", null, String.class);
-    String sayHelloResult = restTemplate.postForObject("cse://springmvc/springmvchello/sayhello", person, String.class);
-    System.out.println("RestTemplate Consumer or POJO Consumer.  You can choose whatever you like.");
-    System.out.println("RestTemplate consumer sayhi services: " + sayHiResult);
-    System.out.println("RestTemplate consumer sayhello services: " + sayHelloResult);
-
-    // POJO Consumer
-    System.out.println("POJO consumer sayhi services: " + hello.sayHi("Java Chassis"));
-    System.out.println("POJO consumer sayhi services: " + hello.sayHello(person));
-  }
-
-  public static void init() throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    private static RestTemplate restTemplate = RestTemplateBuilder.create();
+    
+    @RpcReference(microserviceName = "springmvc", schemaId = "springmvcHello")
+    private static Hello hello;
+    
+    public static void main(String[] args) throws Exception {
+        init();
+        Person person = new Person();
+        person.setName("ServiceComb/Java Chassis");
+        
+        
+        // RestTemplate Consumer or POJO Consumer. You can choose whatever you like
+        // RestTemplate Consumer
+        String sayHiResult = restTemplate.postForObject("cse://springmvc/springmvchello/sayhi?name=Java Chassis", null, String.class);
+        String sayHelloResult = restTemplate.postForObject("cse://springmvc/springmvchello/sayhello", person, String.class);
+        System.out.println("RestTemplate Consumer or POJO Consumer.  You can choose whatever you like.");
+        System.out.println("RestTemplate consumer sayhi services: " + sayHiResult);
+        System.out.println("RestTemplate consumer sayhello services: " + sayHelloResult);
+        
+        // POJO Consumer
+        System.out.println("POJO consumer sayhi services: " + hello.sayHi("Java Chassis"));
+        System.out.println("POJO consumer sayhi services: " + hello.sayHello(person));
+    }
+    
+    public static void init() throws Exception {
+        Log4jUtils.init();
+        BeanUtils.init();
+    }
+	
 }
 ```

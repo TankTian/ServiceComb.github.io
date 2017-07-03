@@ -89,8 +89,11 @@ cse:
 
 ```java
 public interface Hello {
+
     String sayHi(String name);
+	
     String sayHello(Person person);
+	
 }
 ```
 
@@ -101,6 +104,7 @@ public interface Hello {
 ```java
 @RpcSchema(schemaId = "codeFirstHello")
 public class CodeFirstPojoHelloImpl implements Hello{
+
     @Override
     public String sayHi(String name) {
         return "Pojo Hello " + name;
@@ -110,6 +114,7 @@ public class CodeFirstPojoHelloImpl implements Hello{
     public String sayHello(Person person) {
         return "Pojo Hello person " + person.getName();
     }
+	
 }
 ```
 
@@ -119,10 +124,11 @@ public class CodeFirstPojoHelloImpl implements Hello{
 ```java
 public class CodeFirstProviderMain {
 
-  public static void main(String[] args) throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    public static void main(String[] args) throws Exception {
+        Log4jUtils.init();
+        BeanUtils.init();
+    }
+	
 }
 ```
 
@@ -138,7 +144,8 @@ public class CodeFirstProviderMain {
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		">
 
-    <context:component-scan base-package="io.servicecomb.samples.pojo.provider" />
+    <context:component-scan base-package="io.servicecomb.samples.codefirst.provider" />
+	
 </beans>
 ```
 
@@ -174,30 +181,31 @@ cse:
 @Component
 public class CodeFirstConsumerMain {
 
-  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstJaxrsHello")
-  private static Hello jaxrsHello;
-
-  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstSpringmvcHello")
-  private static Hello springmvcHello;
-
-  @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstHello")
-  private static Hello hello;
-
-  public static void main(String[] args) throws Exception {
-    init();
-    System.out.println(hello.sayHi("Java Chassis"));
-    System.out.println(jaxrsHello.sayHi("Java Chassis"));
-    System.out.println(springmvcHello.sayHi("Java Chassis"));
-    Person person = new Person();
-    person.setName("ServiceComb/Java Chassis");
-    System.out.println(hello.sayHello(person));
-    System.out.println(jaxrsHello.sayHello(person));
-    System.out.println(springmvcHello.sayHello(person));
-  }
-
-  public static void init() throws Exception {
-    Log4jUtils.init();
-    BeanUtils.init();
-  }
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstJaxrsHello")
+    private static Hello jaxrsHello;
+    
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstSpringmvcHello")
+    private static Hello springmvcHello;
+    
+    @RpcReference(microserviceName = "codefirst", schemaId = "codeFirstHello")
+    private static Hello hello;
+    
+    public static void main(String[] args) throws Exception {
+        init();
+        System.out.println(hello.sayHi("Java Chassis"));
+        System.out.println(jaxrsHello.sayHi("Java Chassis"));
+        System.out.println(springmvcHello.sayHi("Java Chassis"));
+        Person person = new Person();
+        person.setName("ServiceComb/Java Chassis");
+        System.out.println(hello.sayHello(person));
+        System.out.println(jaxrsHello.sayHello(person));
+        System.out.println(springmvcHello.sayHello(person));
+    }
+    
+    public static void init() throws Exception {
+        Log4jUtils.init();
+        BeanUtils.init();
+    }
+	
 }
 ```
